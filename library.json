@@ -1,0 +1,8 @@
+{
+  "name": "Sst26vf FAT filesystem",
+  "build": {
+    "srcFilter": [
+      "+<src/*.cpp>"
+    ]
+  }
+}
