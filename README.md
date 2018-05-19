@@ -3,11 +3,11 @@
 A library to access the Sst25vf flash chip family. This includes formatting the drive to support FAT and being able to mount the drive.
 
 ## TODO
-[ ] Implement driver for flash chip
-[ ] Implement filesystems hook
-[ ] Implement file hanlder
-[ ] Implement Dir handler
-[ ] Write tests
+[] Implement driver for flash chip
+[] Implement filesystems hook
+[] Implement file hanlder
+[] Implement Dir handler
+[] Write tests
 
 ## Test Cases
 

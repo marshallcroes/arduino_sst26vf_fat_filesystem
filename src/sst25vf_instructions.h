@@ -25,19 +25,30 @@
     Reference: http://ww1.microchip.com/downloads/en/DeviceDoc/20005218E.pdf
  */
 
-#ifndef SST25VF_INSTRUC_H__
-#define SST25VF_INSTRUC_H__
+#ifndef SST26VF_INSTRUC_H__
+#define SST26VF_INSTRUC_H__
 
+
+// Status codes
+#define SST26VF_STAT_OK             0x00
+#define SST26VF_STAT_BUSY           0x01
+#define SST26VF_STAT_WEL            0x02
+#define SST26VF_STAT_WSE            0x04
+#define SST26VF_STAT_WSP            0x08
+#define SST26VF_STAT_WPLD           0x10
+#define SST26VF_STAT_SEC            0x20
+#define SST26VF_STAT_RES            0x40
+#define SST26VF_STAT_BUSY2          0x80
 
 // Configuration instructions
-#define SST25VF_CMD_NOP             0x00
-#define SST25VF_CMD_RSTEN           0x66
-#define SST25VF_CMD_RST             0x99
-#define SST25VF_CMD_EQIO            0x38
-#define SST25VF_CMD_RSTQIO          0xff
-#define SST25VF_CMD_RDSR            0x05
-#define SST25VF_CMD_WRSR            0x01
-#define SST25VF_CMD_RDCR            0x35
+#define SST26VF_CMD_NOP             0x00 // dummy write cmd
+#define SST26VF_CMD_RSTEN           0x66
+#define SST26VF_CMD_RST             0x99
+#define SST26VF_CMD_EQIO            0x38
+#define SST26VF_CMD_RSTQIO          0xff
+#define SST26VF_CMD_RDSR            0x05 // read status register
+#define SST26VF_CMD_WRSR            0x01
+#define SST26VF_CMD_RDCR            0x35
 
 // Read instructions
 #define SST25VF_CMD_READ            0x03
