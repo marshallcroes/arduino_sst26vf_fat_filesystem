@@ -20,18 +20,18 @@
     SOFTWARE.
  */
 
-#ifndef SST25VF_DRIVER_H__
-#define SST25VF_DRIVER_H__
+#ifndef SST26VF_DRIVER_H__
+#define SST26VF_DRIVER_H__
 
 #include <Arduino.h>
 #include <SPI.h>
 
-#include "sst25vf_instructions.h"
+#include "sst26vf_instructions.h"
 
-#define SST25VF_PAGE_SIZE       256   // 4194304 bytes
-#define SST25VF_NUM_PAGES       16384 // 256 sizze
+#define SST26VF_PAGE_SIZE       256   // 4194304 bytes
+#define SST26VF_NUM_PAGES       16384 // 256 sizze
 
-namespace sst25vf {
+namespace sst26vf {
 
   class flash_driver {
         const SPIClass* m_spi = &SPI;
@@ -99,7 +99,7 @@ namespace sst25vf {
 
         struct spi_handler;
 
-  };
+  }; // class flash driver
 
   struct flash_driver::spi_handler {
         template <typename T>
@@ -115,6 +115,6 @@ namespace sst25vf {
         static void read(const T& self, uint8_t* data, uint16_t len);
   };
 
-} // namespace sst25vf
+} // namespace sst26vf
 
 #endif

@@ -1,4 +1,4 @@
-# Sst25vf fat filesystem
+# Sst26vf fat filesystem
 
 A library to access the Sst25vf flash chip family. This includes formatting the drive to support FAT and being able to mount the drive.
 

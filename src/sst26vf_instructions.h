@@ -51,40 +51,40 @@
 #define SST26VF_CMD_RDCR            0x35
 
 // Read instructions
-#define SST25VF_CMD_READ            0x03
-#define SST25VF_CMD_FREAD           0x0b
-#define SST25VF_CMD_SQOR            0x6b
-#define SST25VF_CMD_SQIOR           0xeb
-#define SST25VF_CMD_SDOR            0x3b
-#define SST25VF_CMD_SDIOR           0xbb
-#define SST25VF_CMD_SB              0xc0
-#define SST25VF_CMD_RBSQI           0x0c
-#define SST25VF_CMD_RBSPI           0xec
+#define SST26VF_CMD_READ            0x03
+#define SST26VF_CMD_FREAD           0x0b
+#define SST26VF_CMD_SQOR            0x6b
+#define SST26VF_CMD_SQIOR           0xeb
+#define SST26VF_CMD_SDOR            0x3b
+#define SST26VF_CMD_SDIOR           0xbb
+#define SST26VF_CMD_SB              0xc0
+#define SST26VF_CMD_RBSQI           0x0c
+#define SST26VF_CMD_RBSPI           0xec
 
 // Identification instructions
-#define SST25VF_CMD_JEDECID         0x9f
-#define SST25VF_CMD_QJID            0xaf
-#define SST25VF_CMD_SFDP            0x5a
+#define SST26VF_CMD_JEDECID         0x9f
+#define SST26VF_CMD_QJID            0xaf
+#define SST26VF_CMD_SFDP            0x5a
 
 // Write instructions
-#define SST25VF_CMD_WREN            0x06
-#define SST25VF_CMD_WRDI            0x04
-#define SST25VF_CMD_SE              0x20
-#define SST25VF_CMD_BE              0xd8
-#define SST25VF_CMD_CE              0xc7
-#define SST25VF_CMD_PP              0x02
-#define SST25VF_CMD_SQPP            0x32
-#define SST25VF_CMD_WRSU            0xb0
-#define SST25VF_CMD_WRRE            0x30
+#define SST26VF_CMD_WREN            0x06 // write enable
+#define SST26VF_CMD_WRDI            0x04 // write disable
+#define SST26VF_CMD_SE              0x20
+#define SST26VF_CMD_BE              0xd8
+#define SST26VF_CMD_CE              0xc7
+#define SST26VF_CMD_PP              0x02
+#define SST26VF_CMD_SQPP            0x32
+#define SST26VF_CMD_WRSU            0xb0
+#define SST26VF_CMD_WRRE            0x30
 
 // Protection instructions
-#define SST25VF_CMD_RBPR            0x72
-#define SST25VF_CMD_WBPR            0x42
-#define SST25VF_CMD_LBPR            0x8d
-#define SST25VF_CMD_NVWLDR          0xe8
-#define SST25VF_CMD_ULBPR           0x98
-#define SST25VF_CMD_RSID            0x88
-#define SST25VF_CMD_PSID            0xa5
-#define SST25VF_CMD_LSID            0x85
+#define SST26VF_CMD_RBPR            0x72
+#define SST26VF_CMD_WBPR            0x42
+#define SST26VF_CMD_LBPR            0x8d
+#define SST26VF_CMD_NVWLDR          0xe8
+#define SST26VF_CMD_ULBPR           0x98
+#define SST26VF_CMD_RSID            0x88
+#define SST26VF_CMD_PSID            0xa5
+#define SST26VF_CMD_LSID            0x85
 
 #endif
