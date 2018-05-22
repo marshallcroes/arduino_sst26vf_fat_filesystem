@@ -22,23 +22,24 @@
 
 #include "sst26vf_driver.h"
 
-using namespace sst26vf;
+namespace sst26vf {
+namespace detail {
 
 //------ SPI handler ------
 
 template <typename T>
-static void flash_drive::spi_handler::write(const T& self, char data)
+static void spi_handler::write(const T& self, char data)
 {
-        spi_handler::write(self, data, 1);
+        write(self, data, 1);
 }
 
 template <typename T>
-static void flash_drive::spi_handler::write(const T& self, char* data, uint16_t len)
+static void spi_handler::write(const T& self, char* data, uint16_t len)
 {
         byte c;
 
-        self.m_spi->beginTransaction(SPISettings(SPIFLASH_SPI_SPEED, MSBFIRST, SPI_MODE0));
-        while (length--) {
+        self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE0));
+        while (len--) {
                 c = *data;
                 data++;
                 self.m_spi->transfer(c);
@@ -48,56 +49,60 @@ static void flash_drive::spi_handler::write(const T& self, char* data, uint16_t 
 }
 
 template <typename T>
-static void flash_drive::spi_handler::read(const T& self, uint8_t* data)
+static void spi_handler::read(const T& self, uint8_t* data)
 {
-        spi_handler::read(self, data, 1);
+        read(self, data, 1);
 }
 
 template <typename T>
-static void flash_drive::spi_handler::read(const T& self, uint8_t* data, uint16_t len)
+static void spi_handler::read(const T& self, uint8_t* data, uint16_t len)
 {
         uint8_t x = 0;
 
-        self.m_spi->beginTransaction(SPISettings(SPIFLASH_SPI_SPEED, MSBFIRST, SPI_MODE0));
-        while (length--) {
-                x = _spi->transfer(SST26VF_CMD_NOP);
+        self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE0));
+        while (len--) {
+                x = self.m_spi->transfer(SST26VF_CMD_NOP);
                 *data = x;
                 data++;
         }
 
         self.m_spi->endTransaction();
 }
+} // namespace detail
+using detail::spi_handler;
+
 
 //------ Flash drive ------
 
-flash_drive::flash_drive(uint8_t ss)
-        : m_ss(ss)
+flash_driver::flash_driver(uint8_t ss)
+        : m_ss(ss),
+          m_spi(&SPI)
 {
         digitalWrite(m_ss, HIGH);
         pinMode(m_ss, OUTPUT);
 }
 
-bool flash_drive::begin()
+bool flash_driver::begin()
 {
         m_spi->begin();
 }
 
-uint8_t read_status()
+uint8_t flash_driver::read_status()
 {
         digitalWrite(m_ss, LOW);
-        spi_handler::write(this, SST26VF_CMD_RDSR);
+        spi_handler::write(*this, SST26VF_CMD_RDSR);
 
         uint8_t status;
-        spi_handler::read(this, &status);
+        spi_handler::read(*this, &status);
         digitalWrite(m_ss, HIGH);
 
         return status;
 }
 
-bool write_enable(bool enable)
+bool flash_driver::write_enable(bool enable)
 {
         digitalWrite(m_ss, LOW);
-        spi_handler::write(this,
+        spi_handler::write(*this,
                 enable ? SST26VF_CMD_WREN : SST26VF_CMD_WRDI);
         digitalWrite(m_ss, HIGH);
 
@@ -106,7 +111,7 @@ bool write_enable(bool enable)
         return true;
 }
 
-bool wait_until_ready(uint32_t timeout)
+bool flash_driver::wait_until_ready(uint32_t timeout)
 {
         uint8_t status;
 
@@ -124,7 +129,7 @@ bool wait_until_ready(uint32_t timeout)
         return true;
 }
 
-uint32_t flash_drive::write_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
+uint32_t flash_driver::write_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
 {
         // If the data is only on one page we can take a shortcut
         if ((addr % m_page_size) + len <= m_page_size)
@@ -171,7 +176,7 @@ uint32_t flash_drive::write_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
         return bytes_written;
 }
 
-uint32_t flash_drive::write_page(uint32_t addr, uint8_t* buf, uint32_t len)
+uint32_t flash_driver::write_page(uint32_t addr, uint8_t* buf, uint32_t len)
 {
         // Make sure the address is valid
         if (addr >= SST26VF_MAX_ADDR)
@@ -212,10 +217,10 @@ uint32_t flash_drive::write_page(uint32_t addr, uint8_t* buf, uint32_t len)
         if (len == m_page_size)
                 cmd_list[3] = 0;
 
-        spi_handler::write(this, cmd_list, 4);
+        spi_handler::write(*this, &cmd_list, 4);
 
         // Transfer data
-        spi_handler::write(this, buf, len);
+        spi_handler::write(*this, &buf, len);
 
         // Write only occurs after the CS line is de-asserted
         digitalWrite(m_ss, HIGH);
@@ -227,7 +232,7 @@ uint32_t flash_drive::write_page(uint32_t addr, uint8_t* buf, uint32_t len)
         return len;
 }
 
-uint32_t flash_drive::read_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
+uint32_t flash_driver::read_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
 {
         // Make sure the address is valid
         if (addr >= m_total_size)
@@ -246,14 +251,14 @@ uint32_t flash_drive::read_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
         };
 
         digitalWrite(m_ss, LOW);
-        spi_handler::write(this, cmd_list, 4);
+        spi_handler::write(*this, &cmd_list, 4);
 
         if ((addr+len) > m_total_size) {
                 len = m_total_size - addr;
         }
 
         // Fill response buffer
-        spi_handler::read(this, buf, len);
+        spi_handler::read(*this, &buf, len);
 
         digitalWrite(m_ss, HIGH);
 
@@ -261,20 +266,115 @@ uint32_t flash_drive::read_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
         return len;
 }
 
-bool erase_chip()
+bool flash_driver::erase_chip()
 {
+        if (wait_until_ready()) return false;
+
+        write_enable(true);
+
+        uint8_t status = read_status() & SST26VF_STAT_WEL;
+        if (!status) return false;
+
+        digitalWrite(m_ss, LOW);
+        spi_handler::write(*this, SST26VF_CMD_CE);
+        digitalWrite(m_ss, HIGH);
+
+        if (wait_until_ready(12000)) return false;
+
         return true;
 }
 
-bool erase_sector(uint32_t sector_num)
+bool flash_driver::erase_sector(uint32_t sector_num)
 {
+        if (wait_until_ready()) return false;
+
+        write_enable(true);
+
+        uint8_t status = read_status() & SST26VF_STAT_WEL;
+        if (!status) return falsle;
+
+        uint32_t addr = sector_num * SST26VF_SECTOR_SIZE;
+        uint8_t cmd_list[] = {
+                SST26VF_CMD_SE,
+                (addr >> 16) & 0xff,
+                (addr >> 8)  & 0xff,
+                (addr)       & 0xff,
+        };
+
+        digitalWrite(m_ss, LOW);
+        spi_handler::write(*this, &cmd_list, 4);
+        digitalWrite(m_ss, HIGH);
+
+        wait_until_ready(500);
+
         return true;
 }
 
-bool erase_block(uint32_t block_num)
+bool flash_driver::erase_block(uint32_t block_num)
 {
+        if (wait_until_ready()) return false;
+
+        write_enable(true);
+
+        uint8_t status = read_status() & SST26VF_STAT_WEL;
+        if (!status) return falsle;
+
+        // Has 72 variance size blocks (8*8KB, 2*32KB, 62*64KB)
+        // See datasheet for memory map
+        uint32_t addr = sector_num * SST26VF_SECTOR_SIZE;
+        if (block_num < 4) {
+                addr = block_num * SST26_BLOCK_S_SIZE;
+        } else if (block_num == 4 || block_num == 67) {
+                addr = 4 * SST26VF_BLOCK_S_SIZE + SST26VF_BLOCK_M_SIZE;
+                addr += (block_num - 66) * 62 * SST26VF_BLOCK_L_SIZE;
+        } else if (block_num > 4 && block_num < 67) {
+                addr = 4 * SST26VF_BLOCK_S_SIZE + SST26VF_BLOCK_M_SIZE;
+                addr += (block_num - 4) * SST26VF_BLOCK_L_SIZE;
+        } else if (block_num > 67) {
+                addr = (block_num - 64) * SST26VF_BLOCK_S_SIZE;
+                addr += 2 * SST26VF_BLOCK_M_SIZE;
+                addr += 62 * SST26VF_BLOCK_L_SIZE;
+        }
+
+        uint8_t cmd_list[] = {
+                SST26VF_CMD_SE,
+                (addr >> 16) & 0xff,
+                (addr >> 8)  & 0xff,
+                (addr)       & 0xff,
+        };
+
+        digitalWrite(m_ss, LOW);
+        spi_handler::write(*this, &cmd_list, 4);
+        digitalWrite(m_ss, HIGH);
+
+        wait_until_ready(2000);
+
         return true;
 }
+
+// --------- Debug functions -----------
+
+// void flash_drive::get_id(uint8_t* buffer)
+{
+        //
+// }
+
+void flash_driver::get_manufacturer_info(uint8_t* mfr_id,uint8_t* dev_type, uint8_t* dev_id)
+{
+        digitalWrite(m_ss, LOW);
+        spi_handler::write(*this, SST26VF_CMD_JEDECID); 
+
+        uint8_t buf[3];
+        spi_handler::read(*this, &buf, 3);
+
+        *mfr_id = buf[0];
+        *dev_type = buf[1];
+        *dev_id = buf[2];
+
+        digitalWrite(m_ss, HIGH);
+}
+} // namespace sst26vf
+
 
 
 

@@ -30,11 +30,33 @@
 
 #define SST26VF_PAGE_SIZE       256   // 4194304 bytes
 #define SST26VF_NUM_PAGES       16384 // 256 sizze
+#define SST26VF_SECTOR_SIZE     4096
+#define SST26VF_BLOCK_S_SIZE    8192
+#define SST26VF_BLOCK_M_SIZE    32768
+#define SST26VF_BLOCK_L_SIZE    65536
+
 
 namespace sst26vf {
 
+  namespace detail {
+    struct spi_handler {
+          template <typename T>
+          static void write(const T& self, char data);
+
+          template <typename T>
+          static void write(const T& self, char* data, uint16_t len);
+
+          template <typename T>
+          static void read(const T& self, uint8_t* data);
+
+          template <typename T>
+          static void read(const T& self, uint8_t* data, uint16_t len);
+    };
+  } // namespace detail
+
   class flash_driver {
-        const SPIClass* m_spi = &SPI;
+        SPIClass* m_spi;
+        // const SPIClass* m_spi = &SPI;
 
         const uint8_t m_ss;
         // const uint8_t m_clk;
@@ -80,40 +102,26 @@ namespace sst26vf {
 
         //------ Debug functions ------
 
-        void get_id(uint8_t* buffer);
+        // void get_id(uint8_t* buffer);
 
-        void get_manufacturer_info(uint8_t* mfr_id, uint8_t* dev_id);
+        void get_manufacturer_info(uint8_t* mfr_id, uint8_t* dev_type, uint8_t* dev_id);
 
   private:
         bool write_enable(bool enable);
 
-        uint32_t get_addr();
+        // uint32_t get_addr();
 
-        uint32_t find_first_empty_addr();
+        // uint32_t find_first_empty_addr();
 
         uint8_t read_status();
 
-        bool append_data();
+        // bool append_data();
 
         bool wait_until_ready(uint32_t timeout=1000);
 
-        struct spi_handler;
+        friend struct detail::spi_handler;
 
   }; // class flash driver
-
-  struct flash_driver::spi_handler {
-        template <typename T>
-        static void write(const T& self, char data);
-
-        template <typename T>
-        static void write(const T& self, char* data, uint16_t len);
-
-        template <typename T>
-        static void read(const T& self, uint8_t* data);
-
-        template <typename T>
-        static void read(const T& self, uint8_t* data, uint16_t len);
-  };
 
 } // namespace sst26vf
 

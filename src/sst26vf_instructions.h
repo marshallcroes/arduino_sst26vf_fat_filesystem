@@ -62,16 +62,16 @@
 #define SST26VF_CMD_RBSPI           0xec
 
 // Identification instructions
-#define SST26VF_CMD_JEDECID         0x9f
+#define SST26VF_CMD_JEDECID         0x9f // Get manufacturer info
 #define SST26VF_CMD_QJID            0xaf
 #define SST26VF_CMD_SFDP            0x5a
 
 // Write instructions
 #define SST26VF_CMD_WREN            0x06 // write enable
 #define SST26VF_CMD_WRDI            0x04 // write disable
-#define SST26VF_CMD_SE              0x20
-#define SST26VF_CMD_BE              0xd8
-#define SST26VF_CMD_CE              0xc7
+#define SST26VF_CMD_SE              0x20 // sector erase
+#define SST26VF_CMD_BE              0xd8 // block erase
+#define SST26VF_CMD_CE              0xc7 // chip erase
 #define SST26VF_CMD_PP              0x02
 #define SST26VF_CMD_SQPP            0x32
 #define SST26VF_CMD_WRSU            0xb0
