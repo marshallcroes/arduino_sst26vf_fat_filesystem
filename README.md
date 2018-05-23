@@ -9,6 +9,24 @@ A library to access the Sst26vf flash chip family. This includes formatting the 
 [] Implement Dir handler
 [] Write tests
 
+## Wiring to arduino
+
+spi
+-----
+|1|2|
+-----
+|3|4|
+-----
+|5|6|
+-----
+
+1) miso, connect to so of flash
+2) vcc+, connect to vdd of flash
+3) sck, connect to sck of flash
+4) mosi, connect to si of flash
+5) reset, NC
+6) gnd, connect to vss of flash
+
 ## Test Cases
 
 - Test driver by reading manufacturer id and sucessfully read/write to sector on flash

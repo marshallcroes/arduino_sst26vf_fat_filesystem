@@ -34,28 +34,17 @@
 #define SST26VF_BLOCK_S_SIZE    8192
 #define SST26VF_BLOCK_M_SIZE    32768
 #define SST26VF_BLOCK_L_SIZE    65536
+#define SST26VF_MAX_ADDR        4194304 // bytes (4MB)
 
 
 namespace sst26vf {
 
   namespace detail {
-    struct spi_handler {
-          template <typename T>
-          static void write(const T& self, char data);
-
-          template <typename T>
-          static void write(const T& self, char* data, uint16_t len);
-
-          template <typename T>
-          static void read(const T& self, uint8_t* data);
-
-          template <typename T>
-          static void read(const T& self, uint8_t* data, uint16_t len);
-    };
+    struct spi_handler;
   } // namespace detail
 
   class flash_driver {
-        SPIClass* m_spi;
+        SPIClass* m_spi = &SPI;
         // const SPIClass* m_spi = &SPI;
 
         const uint8_t m_ss;
@@ -63,11 +52,10 @@ namespace sst26vf {
         // const uint8_t m_mosi;
         // const uint8_t m_miso;
 
-        const uint32_t m_page_size;
-        const uint32_t m_num_pages;
-
-        const uint32_t m_total_size;
-        const uint32_t m_addr_size;
+        const uint32_t m_page_size = SST26VF_PAGE_SIZE;
+        const uint32_t m_num_pages = SST26VF_NUM_PAGES;
+        const uint32_t m_total_size = 0;
+        // const uint32_t m_addr_size;
 
   public:
         flash_driver(uint8_t ss);
@@ -122,6 +110,21 @@ namespace sst26vf {
         friend struct detail::spi_handler;
 
   }; // class flash driver
+
+  namespace detail {
+
+    typedef flash_driver Chip;
+
+    struct spi_handler {
+          static void write(const Chip& self, uint8_t data);
+
+          static void write(const Chip& self, uint8_t* data, uint16_t len);
+
+          static void read(const Chip& self, uint8_t* data);
+
+          static void read(const Chip& self, uint8_t* data, uint16_t len);
+    };
+  } // namespace detail
 
 } // namespace sst26vf
 

@@ -2,10 +2,10 @@
 
 const uint8_t enable_pin = 2;
 
-auto chip = sst25vf::flash_driver(enable_pin);
+auto chip = sst26vf::flash_driver(enable_pin);
 
 void setup() {
-    SerialUSB.begin(115200); while(!serialUSB);
+    SerialUSB.begin(115200); while(!SerialUSB);
 
     SerialUSB.println("Begin chip communication test");
     SerialUSB.println("-----------------------------");
