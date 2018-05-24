@@ -20,42 +20,15 @@
     SOFTWARE.
  */
 
-#ifndef SST26VF_FILESYSTEM_H__
-#define SST26VF_FILESYSTEM_H__
+#ifndef SST26VF_CONFIG_H__
+#define SST26VF_CONFIG_H__
 
-namespace sst26vf {
-  // TODO: Implement filesystem
-  class filesystem {
-        filesystem();
-
-        filesystem(const filesystem&) = delete;
-
-  public:
-
-        /*!
-             This function creates the only instance of the class filesystem.
-             The instance is deleted when all reference go out of scope.
-
-             return     filesystem
-         */
-        static filesystem& instance()
-        {
-                static filesystem fs;
-
-                return fs;
-        }
-
-        /*!
-            Attach flash chip to filesystem.
-
-            param       reference to disk drivers.
-         */
-        void attach(const flash_driver& disk);
-  private:
-
-        flash_driver* m_disk;
-
-  };
-} // namespace sst26vf
+#define SST26VF_PAGE_SIZE       256   // 4194304 bytes
+#define SST26VF_NUM_PAGES       16384 // 256 sizze
+#define SST26VF_SECTOR_SIZE     4096
+#define SST26VF_BLOCK_S_SIZE    8192
+#define SST26VF_BLOCK_M_SIZE    32768
+#define SST26VF_BLOCK_L_SIZE    65536
+#define SST26VF_MAX_ADDR        0x1ffffff // (4MB)
 
 #endif

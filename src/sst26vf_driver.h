@@ -26,31 +26,23 @@
 #include <Arduino.h>
 #include <SPI.h>
 
+#include "sst26vf_config.h"
 #include "sst26vf_instructions.h"
-
-#define SST26VF_PAGE_SIZE       256   // 4194304 bytes
-#define SST26VF_NUM_PAGES       16384 // 256 sizze
-#define SST26VF_SECTOR_SIZE     4096
-#define SST26VF_BLOCK_S_SIZE    8192
-#define SST26VF_BLOCK_M_SIZE    32768
-#define SST26VF_BLOCK_L_SIZE    65536
-#define SST26VF_MAX_ADDR        0x1ffffff // (4MB)
 
 
 namespace sst26vf {
 
   namespace detail {
+
+    // forward declare
     struct spi_handler;
+
   } // namespace detail
 
   class flash_driver {
         SPIClass* m_spi = &SPI;
-        // const SPIClass* m_spi = &SPI;
 
         const uint8_t m_ss;
-        // const uint8_t m_clk;
-        // const uint8_t m_mosi;
-        // const uint8_t m_miso;
 
         const uint32_t m_page_size = SST26VF_PAGE_SIZE;
         const uint32_t m_num_pages = SST26VF_NUM_PAGES;
@@ -60,14 +52,36 @@ namespace sst26vf {
   public:
         flash_driver(uint8_t ss);
 
+        /*!
+            Initialize spi and begin communication with flash chip.
+         */
         bool begin();
 
         //------ Erase functions ------
 
+        /*!
+            Erase all data on chip.
+
+            return      true if succeed false otherwise
+         */
         bool erase_chip();
 
+        /*!
+            Erase data in specify sector.
+
+            param       sector number
+
+            return      true if succeed false otherwise
+         */
         bool erase_sector(uint32_t sector_num);
 
+        /*!
+            Erase all data from the specific block. Blocks vary in sizes.
+
+            param       block number
+
+            return      true if succeed false otherwise
+         */
         bool erase_block(uint32_t block_num);
 
         //------ Write functions ------
@@ -80,30 +94,21 @@ namespace sst26vf {
 
         uint32_t read_buffer(uint32_t addr, uint8_t* buf, uint32_t len);
 
-        //------ Standard OS functions ------
-
-        size_t read(uint8_t b);
-
-        size_t write(uint8_t b);
-
-        void seek(uint32_t addr);
-
         //------ Debug functions ------
 
-        // void get_id(uint8_t* buffer);
+        /*!
+            Get the manufacturer information from flash chip.
 
+            param[out]  manufacturer id, should be 0xBF
+            param[out]  device type, should be 0x26
+            param[out]  device id, should be 0x42
+         */
         void get_manufacturer_info(uint8_t* mfr_id, uint8_t* dev_type, uint8_t* dev_id);
 
   private:
         bool write_enable(bool enable);
 
-        // uint32_t get_addr();
-
-        // uint32_t find_first_empty_addr();
-
         uint8_t read_status();
-
-        // bool append_data();
 
         bool wait_until_ready(uint32_t timeout=1000);
 
@@ -115,6 +120,9 @@ namespace sst26vf {
 
     typedef flash_driver Chip;
 
+    /*!
+        SPI class to handle all spi task.
+     */
     struct spi_handler {
           static void write(const Chip& self, uint8_t data);
 

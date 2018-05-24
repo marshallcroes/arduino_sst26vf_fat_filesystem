@@ -3,14 +3,15 @@
 A library to access the Sst26vf flash chip family. This includes formatting the drive to support FAT and being able to mount the drive.
 
 ## TODO
-[] Implement driver for flash chip
-[] Implement filesystems hook
-[] Implement file hanlder
-[] Implement Dir handler
-[] Write tests
+- [x] Implement driver for flash chip
+- [ ] Implement filesystems hook
+- [ ] Implement file hanlder
+- [ ] Implement Dir handler
+- [-] Write tests
 
 ## Wiring to arduino
 
+```
 spi
 -----
 |1|2|
@@ -19,6 +20,7 @@ spi
 -----
 |5|6|
 -----
+```
 
 1) miso, connect to so of flash
 2) vcc+, connect to vdd of flash
