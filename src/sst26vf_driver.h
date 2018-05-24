@@ -34,7 +34,7 @@
 #define SST26VF_BLOCK_S_SIZE    8192
 #define SST26VF_BLOCK_M_SIZE    32768
 #define SST26VF_BLOCK_L_SIZE    65536
-#define SST26VF_MAX_ADDR        4194304 // bytes (4MB)
+#define SST26VF_MAX_ADDR        0x1ffffff // (4MB)
 
 
 namespace sst26vf {
@@ -54,7 +54,7 @@ namespace sst26vf {
 
         const uint32_t m_page_size = SST26VF_PAGE_SIZE;
         const uint32_t m_num_pages = SST26VF_NUM_PAGES;
-        const uint32_t m_total_size = 0;
+        const uint32_t m_total_size = SST26VF_MAX_ADDR;
         // const uint32_t m_addr_size;
 
   public:

@@ -37,7 +37,7 @@ void spi_handler::write(const Chip& self, uint8_t* data, uint16_t len)
 {
         byte c;
 
-        self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE0));
+        self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
         while (len--) {
                 c = *data;
                 data++;
@@ -56,7 +56,7 @@ void spi_handler::read(const Chip& self, uint8_t* data, uint16_t len)
 {
         uint8_t x = 0;
 
-        self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE0));
+        self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
         while (len--) {
                 x = self.m_spi->transfer(SST26VF_CMD_NOP);
                 *data = x;
@@ -198,7 +198,7 @@ uint32_t flash_driver::write_page(uint32_t addr, uint8_t* buf, uint32_t len)
         // Make sure the write enable latch is actually set
         uint8_t status = read_status() & SST26VF_STAT_WEL;
         if (!status)
-                // Throw a write protection error (write enable latch not set)
+                // Throw a write protection error
                 return 0;
 
         digitalWrite(m_ss, LOW);
@@ -323,15 +323,15 @@ bool flash_driver::erase_block(uint32_t block_num)
         if (block_num < 4) {
                 addr = block_num * SST26VF_BLOCK_S_SIZE;
         } else if (block_num == 4) {
-                addr = SST26VF_BLOCK_L_SIZE;
+                addr = SST26VF_BLOCK_M_SIZE;
         } else if (block_num > 4 && block_num < 67) {
-                addr = 4 * SST26VF_BLOCK_S_SIZE + SST26VF_BLOCK_M_SIZE;
-                addr += (block_num - 4) * SST26VF_BLOCK_L_SIZE;
+                // addr = SST26VF_BLOCK_L_SIZE;
+                addr = (block_num - 4) * SST26VF_BLOCK_L_SIZE;
         } else if (block_num == 67) {
-                addr = (63 * SST26VF_BLOCK_L_SIZE) + SST26VF_BLOCK_M_SIZE;
+                addr = (63 * SST26VF_BLOCK_L_SIZE);
         } else if (block_num > 67) {
-                addr = (block_num - 64) * SST26VF_BLOCK_S_SIZE;
-                addr += 64 * SST26VF_BLOCK_L_SIZE;
+                addr = (block_num - 68) * SST26VF_BLOCK_S_SIZE;
+                addr += 63 * SST26VF_BLOCK_L_SIZE + SST26VF_BLOCK_M_SIZE;
         }
 
         uint8_t cmd_list[] = {
@@ -352,11 +352,6 @@ bool flash_driver::erase_block(uint32_t block_num)
 
 // --------- Debug functions -----------
 
-// void flash_drive::get_id(uint8_t* buffer)
-// {
-        //
-// }
-
 void flash_driver::get_manufacturer_info(uint8_t* mfr_id,uint8_t* dev_type, uint8_t* dev_id)
 {
         digitalWrite(m_ss, LOW);
@@ -373,24 +368,3 @@ void flash_driver::get_manufacturer_info(uint8_t* mfr_id,uint8_t* dev_type, uint
         digitalWrite(m_ss, HIGH);
 }
 } // namespace sst26vf
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
