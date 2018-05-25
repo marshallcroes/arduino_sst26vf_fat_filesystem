@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (c) 2018, Marshall Croes
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -53,34 +53,34 @@ namespace sst26vf {
         flash_driver(uint8_t ss);
 
         /*!
-            Initialize spi and begin communication with flash chip.
+         * Initialize spi and begin communication with flash chip.
          */
         bool begin();
 
         //------ Erase functions ------
 
         /*!
-            Erase all data on chip.
-
-            return      true if succeed false otherwise
+         * Erase all data on chip.
+         *
+         * return      true if succeed false otherwise
          */
         bool erase_chip();
 
         /*!
-            Erase data in specify sector.
-
-            param       sector number
-
-            return      true if succeed false otherwise
+         * Erase data in specify sector.
+         *
+         * param       sector number
+         *
+         * return      true if succeed false otherwise
          */
         bool erase_sector(uint32_t sector_num);
 
         /*!
-            Erase all data from the specific block. Blocks vary in sizes.
-
-            param       block number
-
-            return      true if succeed false otherwise
+         * Erase all data from the specific block. Blocks vary in sizes.
+         *
+         * param       block number
+         *
+         * return      true if succeed false otherwise
          */
         bool erase_block(uint32_t block_num);
 
@@ -97,11 +97,11 @@ namespace sst26vf {
         //------ Debug functions ------
 
         /*!
-            Get the manufacturer information from flash chip.
-
-            param[out]  manufacturer id, should be 0xBF
-            param[out]  device type, should be 0x26
-            param[out]  device id, should be 0x42
+         * Get the manufacturer information from flash chip.
+         *
+         * param[out]  manufacturer id, should be 0xBF
+         * param[out]  device type, should be 0x26
+         * param[out]  device id, should be 0x42
          */
         void get_manufacturer_info(uint8_t* mfr_id, uint8_t* dev_type, uint8_t* dev_id);
 
@@ -121,7 +121,7 @@ namespace sst26vf {
     typedef flash_driver Chip;
 
     /*!
-        SPI class to handle all spi task.
+     * SPI class to handle all spi task.
      */
     struct spi_handler {
           static void write(const Chip& self, uint8_t data);

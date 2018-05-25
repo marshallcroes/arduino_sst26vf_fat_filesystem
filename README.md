@@ -7,7 +7,7 @@ A library to access the Sst26vf flash chip family. This includes formatting the 
 - [ ] Implement filesystems hook
 - [ ] Implement file hanlder
 - [ ] Implement Dir handler
-- [-] Write tests
+- [x] Write tests
 
 ## Wiring to arduino
 

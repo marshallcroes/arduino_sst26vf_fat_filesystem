@@ -1,0 +1,4 @@
+BasedOnStyle: WebKit
+IndentWidth: 8
+UseTab: Never
+ColumnLimit: 100
