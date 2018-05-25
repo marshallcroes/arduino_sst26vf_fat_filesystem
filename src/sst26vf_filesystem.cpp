@@ -20,4 +20,53 @@
     SOFTWARE.
  */
 
+#include "sst26vf_filesystem.h"
+
 // TODO: Make a singleton class for binding to FAT functions
+namespace sst26vf {
+
+bool filesystem::exist(const char* file_path)
+{
+        return f_stat(file_path, nullptr) == FR_OK;
+}
+
+bool filesystem::mount()
+{
+        // Mount the filesystem.
+        FRESULT res = f_mount(&m_filesystem, "", 1);
+
+        if (res != FR_OK) {
+                return false;
+        }
+
+        return true;
+}
+
+//------- FAT specific functions ---------
+
+DRESULT filesystem::disk_init()
+{
+        //
+}
+
+DRESULT filesystem::disk_status()
+{
+        //
+}
+
+DRESULT filesystem::disk_read(BYTE* buf, DWORD sector, UINT count)
+{
+        //
+}
+
+DRESULT filesystem::disk_write(const BYTE* buf, DWORD sector, UINT count)
+{
+        //
+}
+
+DRESULT filesystem::disk_ioctl(BYTE cmd, void* buff)
+{
+        //
+}
+
+} // namespace sst26vf

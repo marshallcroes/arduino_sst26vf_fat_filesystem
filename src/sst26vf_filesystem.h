@@ -23,8 +23,10 @@
 #ifndef SST26VF_FILESYSTEM_H__
 #define SST26VF_FILESYSTEM_H__
 
+#include "sst26vf_config.h"
 #include "sst26vf_driver.h"
 
+#include "utility/ffconf.h"
 #include "utility/ff.h"
 
 namespace sst26vf {
@@ -32,7 +34,11 @@ namespace sst26vf {
 class file;
 
 class filesystem {
-        filesystem();
+        filesystem()
+                : m_disk()
+                , m_filesystem()
+        {
+        }
 
         filesystem(const filesystem&) = delete;
 
@@ -72,7 +78,7 @@ class filesystem {
          *
          * param       reference to disk drivers.
          */
-        void attach(const flash_driver& disk);
+        void attach(const flash_driver& disk) { m_disk = disk; }
 
         /*!
          * Functions needed for the ChaN FAT module
@@ -83,21 +89,38 @@ class filesystem {
         DRESULT disk_write(const BYTE* buf, DWORD sector, UINT count);
         DRESULT disk_ioctl(BYTE cmd, void* buff);
 
-        func exist();
+        /*!
+         * Check if file exist
+         *
+         * param        The full path to the file including file name
+         *
+         * return       true if file exist, false otherwise
+         */
+        bool exist(const char* file_path);
+        bool exist(const String& file_path)
+        {
+                return exist(file_path.c_str());
+        }
+
         func remove();
         func open();
 
-        // func mount();
-        // func unmount();
+        /*!
+         * Mount file system to disk
+         *
+         * return       true on succes, false otherwise
+         */
+        bool mount();
 
     private:
         flash_driver& m_disk;
         FATFS m_filesystem;
 
-        const int m_fat_sector_size; // FAT sector size, usually 512
-        const int m_flash_sector_size; // Flash sector erase size, usually 4k
+        const int m_fat_sector_size = FF_MAX_SS; // FAT sector size, usually 512
+        const int m_flash_sector_size = SST26VF_SECTOR_SIZE; // Flash sector erase size, usually 4k
 
-        uint8_t* m_buffer;
+        // Allocate a buffer to hold the data of the sector being overridden.
+        uint8_t* m_buffer = static_cast<uint8_t*>(malloc(SST26VF_SECTOR_SIZE));
 };
 } // namespace sst26vf
 

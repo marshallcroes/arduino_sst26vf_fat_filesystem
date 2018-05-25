@@ -37,6 +37,7 @@ namespace detail {
         {
                 byte c;
 
+                // SST26VF chips operate on SPI_MODE2, input sample on rising and output on falling edge
                 self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
                 while (len--) {
                         c = *data;
@@ -53,6 +54,7 @@ namespace detail {
         {
                 uint8_t x = 0;
 
+                // SST26VF chips operate on SPI_MODE2, input sample on rising and output on falling edge
                 self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
                 while (len--) {
                         x = self.m_spi->transfer(SST26VF_CMD_NOP);
