@@ -28,10 +28,10 @@
 #include "utility/ff.h"
 
 namespace sst26vf {
-  // TODO: Implement filesystem
-  class file;
+// TODO: Implement filesystem
+class file;
 
-  class filesystem {
+class filesystem {
         filesystem();
 
         filesystem(const filesystem&) = delete;
@@ -51,13 +51,9 @@ namespace sst26vf {
          *
          * return       The disk address of specified FAT sector
          */
-        uint32_t fat_sector_address(uint32_t sector)
-        {
-                return sector * m_fat_sector_size;
-        }
+        uint32_t fat_sector_address(uint32_t sector) { return sector * m_fat_sector_size; }
 
-  public:
-
+    public:
         /*!
          * This function creates the only instance of the class filesystem.
          * The instance is deleted when all reference go out of scope.
@@ -94,8 +90,7 @@ namespace sst26vf {
         // func mount();
         // func unmount();
 
-  private:
-
+    private:
         flash_driver& m_disk;
         FATFS m_filesystem;
 
@@ -103,8 +98,7 @@ namespace sst26vf {
         const int m_flash_sector_size; // Flash sector erase size, usually 4k
 
         uint8_t* m_buffer;
-
-  };
+};
 } // namespace sst26vf
 
 #endif

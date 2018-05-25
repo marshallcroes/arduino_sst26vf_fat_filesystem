@@ -25,54 +25,50 @@
 namespace sst26vf {
 namespace detail {
 
-//------ SPI handler ------
+        //------ SPI handler ------
 
-void spi_handler::write(const Chip& self, uint8_t data)
-{
-        uint8_t x[] = { data };
-        write(self, x, 1);
-}
-
-void spi_handler::write(const Chip& self, uint8_t* data, uint16_t len)
-{
-        byte c;
-
-        self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
-        while (len--) {
-                c = *data;
-                data++;
-                self.m_spi->transfer(c);
+        void spi_handler::write(const Chip& self, uint8_t data)
+        {
+                uint8_t x[] = { data };
+                write(self, x, 1);
         }
 
-        self.m_spi->endTransaction();
-}
+        void spi_handler::write(const Chip& self, uint8_t* data, uint16_t len)
+        {
+                byte c;
 
-void spi_handler::read(const Chip& self, uint8_t* data)
-{
-        read(self, data, 1);
-}
+                self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
+                while (len--) {
+                        c = *data;
+                        data++;
+                        self.m_spi->transfer(c);
+                }
 
-void spi_handler::read(const Chip& self, uint8_t* data, uint16_t len)
-{
-        uint8_t x = 0;
-
-        self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
-        while (len--) {
-                x = self.m_spi->transfer(SST26VF_CMD_NOP);
-                *data = x;
-                data++;
+                self.m_spi->endTransaction();
         }
 
-        self.m_spi->endTransaction();
-}
+        void spi_handler::read(const Chip& self, uint8_t* data) { read(self, data, 1); }
+
+        void spi_handler::read(const Chip& self, uint8_t* data, uint16_t len)
+        {
+                uint8_t x = 0;
+
+                self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
+                while (len--) {
+                        x = self.m_spi->transfer(SST26VF_CMD_NOP);
+                        *data = x;
+                        data++;
+                }
+
+                self.m_spi->endTransaction();
+        }
 } // namespace detail
 using detail::spi_handler;
-
 
 //------ Flash drive ------
 
 flash_driver::flash_driver(uint8_t ss)
-        : m_ss(ss)
+    : m_ss(ss)
 {
         digitalWrite(m_ss, HIGH);
         pinMode(m_ss, OUTPUT);
@@ -100,11 +96,10 @@ uint8_t flash_driver::read_status()
 bool flash_driver::write_enable(bool enable)
 {
         digitalWrite(m_ss, LOW);
-        spi_handler::write(*this,
-                enable ? SST26VF_CMD_WREN : SST26VF_CMD_WRDI);
+        spi_handler::write(*this, enable ? SST26VF_CMD_WREN : SST26VF_CMD_WRDI);
         digitalWrite(m_ss, HIGH);
 
-        asm __volatile__ ("nop");
+        asm __volatile__("nop");
 
         return true;
 }
@@ -115,12 +110,11 @@ bool flash_driver::wait_until_ready(uint32_t timeout)
 
         // Read status bit to check if busy
         while (timeout > 0) {
-                status = read_status()
-                        & (SST26VF_STAT_BUSY | SST26VF_STAT_BUSY2);
+                status = read_status() & (SST26VF_STAT_BUSY | SST26VF_STAT_BUSY2);
                 if (!status)
                         return false;
 
-                asm __volatile__ ("nop");
+                asm __volatile__("nop");
                 timeout--;
         }
 
@@ -137,7 +131,7 @@ uint32_t flash_driver::write_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
         uint32_t bytes_written = 0;
         uint32_t buf_offset = 0;
 
-        while(len > 0) {
+        while (len > 0) {
                 // Figure out how many bytes need to be written to this page
                 uint32_t bytes_to_write = m_page_size - (addr % m_page_size);
 
@@ -151,7 +145,7 @@ uint32_t flash_driver::write_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
 
                 // Adjust address and len, and buffer offset
                 addr += bytes_to_write;
-                len  -= bytes_to_write;
+                len -= bytes_to_write;
 
                 buf_offset += bytes_to_write;
 
@@ -204,12 +198,8 @@ uint32_t flash_driver::write_page(uint32_t addr, uint8_t* buf, uint32_t len)
         digitalWrite(m_ss, LOW);
 
         // Send page progam command, 24-bit address
-        uint8_t cmd_list[] = {
-                SST26VF_CMD_PP,
-                (addr >> 16) & 0xff,
-                (addr >> 8)  & 0xff,
-                (addr)       & 0xff
-        };
+        uint8_t cmd_list[]
+            = { SST26VF_CMD_PP, (addr >> 16) & 0xff, (addr >> 8) & 0xff, (addr)&0xff };
 
         // set lower 8 bits to 0 to avoid wrapping
         if (len == m_page_size)
@@ -244,14 +234,14 @@ uint32_t flash_driver::read_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
         uint8_t cmd_list[] = {
                 SST26VF_CMD_READ,
                 (addr >> 16) & 0xff,
-                (addr >> 8)  & 0xff,
-                (addr)       & 0xff,
+                (addr >> 8) & 0xff,
+                (addr)&0xff,
         };
 
         digitalWrite(m_ss, LOW);
         spi_handler::write(*this, cmd_list, 4);
 
-        if ((addr+len) > m_total_size) {
+        if ((addr + len) > m_total_size) {
                 len = m_total_size - addr;
         }
 
@@ -266,37 +256,42 @@ uint32_t flash_driver::read_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
 
 bool flash_driver::erase_chip()
 {
-        if (wait_until_ready()) return false;
+        if (wait_until_ready())
+                return false;
 
         write_enable(true);
 
         uint8_t status = read_status() & SST26VF_STAT_WEL;
-        if (!status) return false;
+        if (!status)
+                return false;
 
         digitalWrite(m_ss, LOW);
         spi_handler::write(*this, SST26VF_CMD_CE);
         digitalWrite(m_ss, HIGH);
 
-        if (wait_until_ready(12000)) return false;
+        if (wait_until_ready(12000))
+                return false;
 
         return true;
 }
 
 bool flash_driver::erase_sector(uint32_t sector_num)
 {
-        if (wait_until_ready()) return false;
+        if (wait_until_ready())
+                return false;
 
         write_enable(true);
 
         uint8_t status = read_status() & SST26VF_STAT_WEL;
-        if (!status) return false;
+        if (!status)
+                return false;
 
         uint32_t addr = sector_num * SST26VF_SECTOR_SIZE;
         uint8_t cmd_list[] = {
                 SST26VF_CMD_SE,
                 (addr >> 16) & 0xff,
-                (addr >> 8)  & 0xff,
-                (addr)       & 0xff,
+                (addr >> 8) & 0xff,
+                (addr)&0xff,
         };
 
         digitalWrite(m_ss, LOW);
@@ -310,12 +305,14 @@ bool flash_driver::erase_sector(uint32_t sector_num)
 
 bool flash_driver::erase_block(uint32_t block_num)
 {
-        if (wait_until_ready()) return false;
+        if (wait_until_ready())
+                return false;
 
         write_enable(true);
 
         uint8_t status = read_status() & SST26VF_STAT_WEL;
-        if (!status) return false;
+        if (!status)
+                return false;
 
         // Has 72 variance size blocks (8*8KB, 2*32KB, 62*64KB)
         // See datasheet for memory map
@@ -337,8 +334,8 @@ bool flash_driver::erase_block(uint32_t block_num)
         uint8_t cmd_list[] = {
                 SST26VF_CMD_SE,
                 (addr >> 16) & 0xff,
-                (addr >> 8)  & 0xff,
-                (addr)       & 0xff,
+                (addr >> 8) & 0xff,
+                (addr)&0xff,
         };
 
         digitalWrite(m_ss, LOW);
@@ -352,7 +349,7 @@ bool flash_driver::erase_block(uint32_t block_num)
 
 // --------- Debug functions -----------
 
-void flash_driver::get_manufacturer_info(uint8_t* mfr_id,uint8_t* dev_type, uint8_t* dev_id)
+void flash_driver::get_manufacturer_info(uint8_t* mfr_id, uint8_t* dev_type, uint8_t* dev_id)
 {
         digitalWrite(m_ss, LOW);
         spi_handler::write(*this, SST26VF_CMD_JEDECID);

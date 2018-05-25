@@ -29,17 +29,16 @@
 #include "sst26vf_config.h"
 #include "sst26vf_instructions.h"
 
-
 namespace sst26vf {
 
-  namespace detail {
+namespace detail {
 
-    // forward declare
-    struct spi_handler;
+        // forward declare
+        struct spi_handler;
 
-  } // namespace detail
+} // namespace detail
 
-  class flash_driver {
+class flash_driver {
         SPIClass* m_spi = &SPI;
 
         const uint8_t m_ss;
@@ -49,7 +48,7 @@ namespace sst26vf {
         const uint32_t m_total_size = SST26VF_MAX_ADDR;
         // const uint32_t m_addr_size;
 
-  public:
+    public:
         flash_driver(uint8_t ss);
 
         /*!
@@ -105,34 +104,34 @@ namespace sst26vf {
          */
         void get_manufacturer_info(uint8_t* mfr_id, uint8_t* dev_type, uint8_t* dev_id);
 
-  private:
+    private:
         bool write_enable(bool enable);
 
         uint8_t read_status();
 
-        bool wait_until_ready(uint32_t timeout=1000);
+        bool wait_until_ready(uint32_t timeout = 1000);
 
         friend struct detail::spi_handler;
 
-  }; // class flash driver
+}; // class flash driver
 
-  namespace detail {
+namespace detail {
 
-    typedef flash_driver Chip;
+        typedef flash_driver Chip;
 
-    /*!
-     * SPI class to handle all spi task.
-     */
-    struct spi_handler {
-          static void write(const Chip& self, uint8_t data);
+        /*!
+         * SPI class to handle all spi task.
+         */
+        struct spi_handler {
+                static void write(const Chip& self, uint8_t data);
 
-          static void write(const Chip& self, uint8_t* data, uint16_t len);
+                static void write(const Chip& self, uint8_t* data, uint16_t len);
 
-          static void read(const Chip& self, uint8_t* data);
+                static void read(const Chip& self, uint8_t* data);
 
-          static void read(const Chip& self, uint8_t* data, uint16_t len);
-    };
-  } // namespace detail
+                static void read(const Chip& self, uint8_t* data, uint16_t len);
+        };
+} // namespace detail
 
 } // namespace sst26vf
 
