@@ -46,27 +46,87 @@ bool filesystem::mount()
 
 DRESULT filesystem::disk_init()
 {
-        //
+        return RES_OK;
 }
 
 DRESULT filesystem::disk_status()
 {
-        //
+        return RES_OK;
 }
 
 DRESULT filesystem::disk_read(BYTE* buf, DWORD sector, UINT count)
 {
-        //
+        uint32_t addr = fat_sector_address(sector);
+        if (!m_disk.read_buffer(addr, buf, count * m_fat_sector_size)) {
+                return RES_ERROR;
+        }
+
+        return RES_OK;
 }
 
 DRESULT filesystem::disk_write(const BYTE* buf, DWORD sector, UINT count)
 {
-        //
+        // Check for memory allocation successfull.
+        if (!m_buffer) return RES_ERROR;
+
+        int sector_num = 0;
+        while (count) {
+                uint32_t addr = fat_sector_address(sector_num);
+                uint32_t sector_start = flash_sector_base(addr);
+
+                int available = (sector_start + m_flash_sector_size - addr) / m_fat_sector_size;
+                int count_to_write = min((count - sector_num), available);
+
+                if (m_disk.read_buffer(
+                        sector_start, m_buffer, m_flash_sector_size) != m_flash_sector_size) {
+                        return RES_ERROR;
+                }
+
+                uint16_t block_offset = flash_sector_offset(addr);
+                memcpy((m_buffer + block_offset),
+                       (buf + sector_num * m_fat_sector_size),
+                       count_to_write * m_fat_sector_size);
+
+                if (!m_disk.erase_sector(sector_start/m_flash_sector_size)) {
+                        return RES_ERROR;
+                }
+
+                if (m_disk.write_buffer(sector_start, m_buffer, m_flash_sector_size)
+                         != m_flash_sector_size) {
+                        return RES_ERROR;
+                }
+
+                count -= count_to_write;
+                sector_num++;
+        }
+        return RES_OK;
 }
 
 DRESULT filesystem::disk_ioctl(BYTE cmd, void* buff)
 {
-        //
+        switch(cmd) {
+        case GET_SECTOR_COUNT: {
+                DWORD* count = static_cast<DWORD*>(buff);
+                *count = sector_count();
+        } break;
+
+        case GET_SECTOR_SIZE: {
+                WORD* count = static_cast<WORD*>(buff);
+                *count = m_fat_sector_size;
+        } break;
+
+        case GET_BLOCK_SIZE: {
+                DWORD* count = static_cast<DWORD*>(buff);
+                count = m_flash_sector_size/m_fat_sector_size;
+        } break;
+
+        // Not yet supported commands
+        case CTRL_SYNC:
+        case CTEL_TRIM:
+        default: break;
+        }
+
+        return RES_OK;
 }
 
 } // namespace sst26vf

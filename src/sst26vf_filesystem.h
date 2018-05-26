@@ -102,8 +102,31 @@ class filesystem {
                 return exist(file_path.c_str());
         }
 
-        func remove();
-        func open();
+        /*!
+         * Erases the file from the disk
+         *
+         * param        The full path to the file
+         *
+         * return       true if successfull, false otherwise.
+         */
+        bool remove(const char* file_path);
+        bool remove(const String& file_path)
+        {
+                return remove(file_path.c_str());
+        }
+
+        /*!
+         * Open a file from the filesystem
+         *
+         * param        The full path to the file
+         *
+         * return       A file handler to manipulate the open file.
+         */
+        file open(const char* file_path);
+        file open(const String& file_path)
+        {
+                return open(file_path.c_str());
+        }
 
         /*!
          * Mount file system to disk
