@@ -26,13 +26,13 @@
 #include "sst26vf_config.h"
 #include "sst26vf_driver.h"
 
+#include "file.h"
+
 #include "utility/ffconf.h"
 #include "utility/ff.h"
 #include "utility/diskio.h"
 
 namespace sst26vf {
-// TODO: Implement filesystem
-class file;
 
 class filesystem {
         filesystem()

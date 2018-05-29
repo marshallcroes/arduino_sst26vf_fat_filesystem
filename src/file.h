@@ -23,5 +23,49 @@
 #ifndef SST26VF_FILE_H__
 #define SST26VF_FILE_H__
 
+#include "utility/ff.h"
+
+namespace sst26vf {
+
+class file {
+    public:
+        file()
+            : m_opened(false)
+            , m_file({ 0 })
+            , m_file_info({ 0 })
+        {
+        }
+
+        file(const char* filepath, uint8_t mode = FILE_READ);
+
+        size_t write(uint8_t val) { return write(&val, 1); }
+        size_t write(const uint8_t* buf, size_t size);
+
+        int read();
+        int read(void* buf, uint16_t nbyte);
+
+        int peek();
+
+        void flush() { f_sync(&m_file); }
+
+        bool seek(uint32_t pos) { f_lseek(&m_file, pos); }
+
+        uint32_t position() { f_tell(&m_file); }
+
+        uint32_t size() { f_size(&m_file); }
+
+        void close();
+
+        operator bool() { return m_opened; }
+
+        char* name() { return m_file_info.fname; }
+
+    private:
+        bool m_opened;
+        FIL m_file;
+        FILINFO m_file_info;
+};
+
+} // namespace sst26vf
 
 #endif

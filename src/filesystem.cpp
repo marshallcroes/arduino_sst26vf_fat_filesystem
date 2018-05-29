@@ -20,7 +20,7 @@
     SOFTWARE.
  */
 
-#include "sst26vf_filesystem.h"
+#include "filesystem.h"
 
 // TODO: Make a singleton class for binding to FAT functions
 namespace sst26vf {
@@ -87,7 +87,7 @@ DRESULT filesystem::disk_write(const BYTE* buf, DWORD sector, UINT count)
                        (buf + sector_num * m_fat_sector_size),
                        count_to_write * m_fat_sector_size);
 
-                if (!m_disk.erase_sector(sector_start/m_flash_sector_size)) {
+                if (!m_disk.erase_sector(sector_start / m_flash_sector_size)) {
                         return RES_ERROR;
                 }
 
@@ -118,7 +118,7 @@ DRESULT filesystem::disk_ioctl(BYTE cmd, void* buff)
 
         case GET_BLOCK_SIZE: {
                 DWORD* count = static_cast<DWORD*>(buff);
-                count = m_flash_sector_size/m_fat_sector_size;
+                count = m_flash_sector_size / m_fat_sector_size;
         } break;
 
         // Not yet supported commands
