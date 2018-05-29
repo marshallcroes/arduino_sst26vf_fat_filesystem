@@ -72,7 +72,7 @@ DRESULT filesystem::disk_write(const BYTE* buf, DWORD sector, UINT count)
         int sector_num = 0;
         while (count) {
                 uint32_t addr = fat_sector_address(sector_num);
-                uint32_t sector_start = flash_sector_base(addr);
+                uint32_t sector_start = addr & 0xfff000; // Get base
 
                 int available = (sector_start + m_flash_sector_size - addr) / m_fat_sector_size;
                 int count_to_write = min((count - sector_num), available);
@@ -82,7 +82,7 @@ DRESULT filesystem::disk_write(const BYTE* buf, DWORD sector, UINT count)
                         return RES_ERROR;
                 }
 
-                uint16_t block_offset = flash_sector_offset(addr);
+                uint16_t block_offset = addr & 0x000fff; // Get offset
                 memcpy((m_buffer + block_offset),
                        (buf + sector_num * m_fat_sector_size),
                        count_to_write * m_fat_sector_size);
@@ -99,6 +99,7 @@ DRESULT filesystem::disk_write(const BYTE* buf, DWORD sector, UINT count)
                 count -= count_to_write;
                 sector_num++;
         }
+
         return RES_OK;
 }
 
@@ -123,7 +124,8 @@ DRESULT filesystem::disk_ioctl(BYTE cmd, void* buff)
         // Not yet supported commands
         case CTRL_SYNC:
         case CTEL_TRIM:
-        default: break;
+        // So throw invalid parameter instead
+        default: return RES_PARERR; break;
         }
 
         return RES_OK;

@@ -28,6 +28,7 @@
 
 #include "utility/ffconf.h"
 #include "utility/ff.h"
+#include "utility/diskio.h"
 
 namespace sst26vf {
 // TODO: Implement filesystem
@@ -35,8 +36,7 @@ class file;
 
 class filesystem {
         filesystem()
-                : m_disk()
-                , m_filesystem()
+                : m_filesystem()
         {
         }
 
