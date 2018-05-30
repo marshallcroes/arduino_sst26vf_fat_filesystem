@@ -4,10 +4,10 @@ A library to access the Sst26vf flash chip family. This includes formatting the 
 
 ## TODO
 - [x] Implement driver for flash chip
-- [ ] Implement filesystems hook
-- [ ] Implement file hanlder
+- [x] Implement filesystems hook
+- [x] Implement file hanlder
 - [ ] Implement Dir handler
-- [x] Write tests
+- [ ] Write tests
 
 ## Wiring to arduino
 

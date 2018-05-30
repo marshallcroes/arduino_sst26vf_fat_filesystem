@@ -23,6 +23,8 @@
 #ifndef SST26VF_FILESYSTEM_H__
 #define SST26VF_FILESYSTEM_H__
 
+#include <utility>
+
 #include "sst26vf_config.h"
 #include "sst26vf_driver.h"
 
@@ -49,7 +51,7 @@ class filesystem {
          */
         uint32_t sector_count()
         {
-                return (m_disk.page_size() * m_disk.num_pages()) / m_fat_sector_size;
+                return (SST26VF_PAGE_SIZE * SST26VF_NUM_PAGES) / m_fat_sector_size;
         }
 
         /*!
@@ -76,9 +78,9 @@ class filesystem {
         /*!
          * Attach flash chip to filesystem.
          *
-         * param       reference to disk drivers.
+         * param       moves instance of disk drivers.
          */
-        void attach(const flash_driver& disk) { m_disk = disk; }
+        void attach(flash_driver&& disk) { m_disk = std::move(disk); }
 
         /*!
          * Functions needed for the ChaN FAT module
@@ -136,7 +138,7 @@ class filesystem {
         bool mount();
 
     private:
-        flash_driver& m_disk;
+        flash_driver m_disk;
         FATFS m_filesystem;
 
         const int m_fat_sector_size = FF_MAX_SS; // FAT sector size, usually 512

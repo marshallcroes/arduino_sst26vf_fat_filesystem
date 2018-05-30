@@ -67,7 +67,7 @@ int file::read()
                 return -1;
         }
 
-        return buff[0];
+        return buf[0];
 }
 
 int file::read(void* buf, uint16_t n_byte)

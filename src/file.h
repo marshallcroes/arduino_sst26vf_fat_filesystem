@@ -23,7 +23,10 @@
 #ifndef SST26VF_FILE_H__
 #define SST26VF_FILE_H__
 
+#include <Arduino.h>
+
 #include "utility/ff.h"
+#include "utility/diskio.h"
 
 namespace sst26vf {
 
@@ -36,7 +39,7 @@ class file {
         {
         }
 
-        file(const char* filepath, uint8_t mode = FILE_READ);
+        file(const char* filepath, uint8_t mode = FA_READ);
 
         size_t write(uint8_t val) { return write(&val, 1); }
         size_t write(const uint8_t* buf, size_t size);
@@ -48,11 +51,11 @@ class file {
 
         void flush() { f_sync(&m_file); }
 
-        bool seek(uint32_t pos) { f_lseek(&m_file, pos); }
+        bool seek(uint32_t pos) { return f_lseek(&m_file, pos); }
 
-        uint32_t position() { f_tell(&m_file); }
+        uint32_t position() { return f_tell(&m_file); }
 
-        uint32_t size() { f_size(&m_file); }
+        uint32_t size() { return f_size(&m_file); }
 
         void close();
 

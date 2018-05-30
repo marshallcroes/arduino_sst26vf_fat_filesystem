@@ -71,7 +71,7 @@ DRESULT filesystem::disk_write(const BYTE* buf, DWORD sector, UINT count)
 
         int sector_num = 0;
         while (count) {
-                uint32_t addr = fat_sector_address(sector_num);
+                uint32_t addr = fat_sector_address(sector + sector_num);
                 uint32_t sector_start = addr & 0xfff000; // Get base
 
                 int available = (sector_start + m_flash_sector_size - addr) / m_fat_sector_size;
@@ -118,12 +118,12 @@ DRESULT filesystem::disk_ioctl(BYTE cmd, void* buff)
 
         case GET_BLOCK_SIZE: {
                 DWORD* count = static_cast<DWORD*>(buff);
-                count = m_flash_sector_size / m_fat_sector_size;
+                *count = m_flash_sector_size / m_fat_sector_size;
         } break;
 
         // Not yet supported commands
         case CTRL_SYNC:
-        case CTEL_TRIM:
+        case CTRL_TRIM:
         // So throw invalid parameter instead
         default: return RES_PARERR; break;
         }

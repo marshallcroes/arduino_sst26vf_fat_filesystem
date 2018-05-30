@@ -41,7 +41,7 @@ namespace detail {
 class flash_driver {
         SPIClass* m_spi = &SPI;
 
-        const uint8_t m_ss;
+        uint8_t m_ss = 0;
 
         const uint32_t m_page_size = SST26VF_PAGE_SIZE;
         const uint32_t m_num_pages = SST26VF_NUM_PAGES;
@@ -49,7 +49,12 @@ class flash_driver {
         // const uint32_t m_addr_size;
 
     public:
+        flash_driver() = default;
         flash_driver(uint8_t ss);
+        flash_driver(flash_driver&& other) = default;
+
+        flash_driver& operator=(const flash_driver& other) = delete;
+        flash_driver& operator=(flash_driver&& other);
 
         /*!
          * Initialize spi and begin communication with flash chip.

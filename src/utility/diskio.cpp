@@ -22,174 +22,35 @@
 
 #include "diskio.h"
 
-#include "sst26vf_filesystem.h"
+#include "filesystem.h"
 
-DSTATUS disk_status (BYTE pdrv)
+DSTATUS disk_status (BYTE pdrv [[maybe_unused]])
 {
         auto& fs = sst26vf::filesystem::instance();
-
-
-	DSTATUS stat;
-	int result;
-
-	switch (pdrv) {
-	case DEV_RAM :
-		result = RAM_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case DEV_MMC :
-		result = MMC_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case DEV_USB :
-		result = USB_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
-	}
-	return STA_NOINIT;
+	return fs.disk_status();
 }
 
-DSTATUS disk_initialize (BYTE pdrv)
+DSTATUS disk_initialize (BYTE pdrv [[maybe_unused]])
 {
         auto& fs = sst26vf::filesystem::instance();
-	DSTATUS stat;
-	int result;
-
-	switch (pdrv) {
-	case DEV_RAM :
-		result = RAM_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case DEV_MMC :
-		result = MMC_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case DEV_USB :
-		result = USB_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
-	}
-	return STA_NOINIT;
+	return fs.disk_init();
 }
 
-DRESULT disk_read (BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
+DRESULT disk_read (BYTE pdrv [[maybe_unused]], BYTE *buff, DWORD sector, UINT count)
 {
         auto& fs = sst26vf::filesystem::instance();
-	DRESULT res;
-	int result;
-
-	switch (pdrv) {
-	case DEV_RAM :
-		// translate the arguments here
-
-		result = RAM_disk_read(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case DEV_MMC :
-		// translate the arguments here
-
-		result = MMC_disk_read(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case DEV_USB :
-		// translate the arguments here
-
-		result = USB_disk_read(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-	}
-
-	return RES_PARERR;
+	return fs.disk_read(buff, sector, count);
 }
 
-DRESULT disk_write (BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
+DRESULT disk_write (BYTE pdrv [[maybe_unused]], const BYTE *buff, DWORD sector, UINT count)
 {
         auto& fs = sst26vf::filesystem::instance();
-	DRESULT res;
-	int result;
-
-	switch (pdrv) {
-	case DEV_RAM :
-		// translate the arguments here
-
-		result = RAM_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case DEV_MMC :
-		// translate the arguments here
-
-		result = MMC_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case DEV_USB :
-		// translate the arguments here
-
-		result = USB_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-	}
-
-	return RES_PARERR;
+	return fs.disk_write(buff, sector, count);
 }
 
-DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void *buff)
+DRESULT disk_ioctl (BYTE pdrv [[maybe_unused]], BYTE cmd, void *buff)
 {
         auto& fs = sst26vf::filesystem::instance();
-	DRESULT res;
-	int result;
-
-	switch (pdrv) {
-	case DEV_RAM :
-
-		// Process of the command for the RAM drive
-
-		return res;
-
-	case DEV_MMC :
-
-		// Process of the command for the MMC/SD card
-
-		return res;
-
-	case DEV_USB :
-
-		// Process of the command the USB drive
-
-		return res;
-	}
-
-	return RES_PARERR;
+	return fs.disk_ioctl(cmd, buff);
 }
 
