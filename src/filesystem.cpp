@@ -42,6 +42,33 @@ bool filesystem::mount()
         return true;
 }
 
+bool filesystem::remove(const char* file_path)
+{
+        return f_unlink(file_path) == FR_OK;
+}
+
+file filesystem::open(const char* file_path)
+{
+        return file(file_path, (FA_READ | FA_WRITE | FA_OPEN_APPEND));
+}
+
+void filesystem::reformat()
+{
+        DWORD plist[] = { 100, 0, 0, 0 }; // 1 partition with 100% of space
+        uint8_t buf[512] = { 0 }; // working buffer for f_disk function
+
+        FRESULT r = f_fdisk(0, plist, buf);
+        if (r != FR_OK) {
+                exit(0);
+        }
+
+        // Make filesystem
+        r = f_mkfs("", FM_ANY, 0, buf, sizeof(buf));
+        if (r != FR_OK) {
+                exit(0);
+        }
+}
+
 //------- FAT specific functions ---------
 
 DRESULT filesystem::disk_init()

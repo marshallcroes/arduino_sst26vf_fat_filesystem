@@ -30,7 +30,8 @@
 
 namespace sst26vf {
 
-class file {
+// Extending stream makes it possible this with other libraries.
+class file : Stream {
     public:
         file()
             : m_opened(false)
@@ -41,27 +42,100 @@ class file {
 
         file(const char* filepath, uint8_t mode = FA_READ);
 
+        /*!
+         * Writes to the current open file
+         *
+         * param        The data being written.
+         *
+         * return       Totaal bytes written.
+         */
         size_t write(uint8_t val) { return write(&val, 1); }
+
+        /*!
+         * Writes to the current open file
+         *
+         * param        The data being written.
+         * param        The amount of bytes being written.
+         *
+         * return       Totaal bytes written.
+         */
         size_t write(const uint8_t* buf, size_t size);
 
+        size_t print(const String& s) { return write(s.c_str(), s.length()); }
+
+        /*!
+         * Reads the contents of the currently open file.
+         *
+         * return       The value read from the file.
+         */
         int read();
+
+        /*!
+         * Reads the contents of the currently open file.
+         *
+         * param[out]   Buffer to hold data.
+         * param[in]    How many bytes to read. (How large is the buffer)
+         *
+         * return       The total bytes read from file.
+         */
         int read(void* buf, uint16_t nbyte);
 
-        int peek();
+        /*!
+         * Peek into the next byte of content.
+         *
+         * return       next byte.
+         */
+        int peek() override;
 
-        void flush() { f_sync(&m_file); }
+        /*!
+         * Flush the buffer.
+         */
+        void flush() override { f_sync(&m_file); }
 
         bool seek(uint32_t pos) { return f_lseek(&m_file, pos); }
 
+        /*!
+         * Get the position we are reading from file.
+         *
+         * return       the position
+         */
         uint32_t position() { return f_tell(&m_file); }
 
+        /*!
+         * Get the file size.
+         *
+         * return       file size in bytes
+         */
         uint32_t size() { return f_size(&m_file); }
+
+        /*!
+         * Get the amount of byte available from file.
+         *
+         * return       total byte available
+         */
+        int available()
+        { 
+                uint32_t n = size() - position();
+                return n > 0x7fff ? n : 0x7fff; 
+        }
 
         void close();
 
+        /*!
+         * Comparison operator, checks if file is opened.
+         *
+         * return       true if file is opened, false otherwise.
+         */
         operator bool() { return m_opened; }
 
+        /*!
+         * Get the file name.
+         *
+         * return       A char array of the name of the file.
+         */
         char* name() { return m_file_info.fname; }
+
+        using Print::write;
 
     private:
         bool m_opened;

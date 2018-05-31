@@ -54,7 +54,12 @@ class flash_driver {
         flash_driver(flash_driver&& other) = default;
 
         flash_driver& operator=(const flash_driver& other) = delete;
-        flash_driver& operator=(flash_driver&& other);
+        flash_driver& operator=(flash_driver&& other)
+        {
+                m_ss = other.m_ss;
+
+                return *this;
+        }
 
         /*!
          * Initialize spi and begin communication with flash chip.

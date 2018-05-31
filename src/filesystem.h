@@ -137,6 +137,16 @@ class filesystem {
          */
         bool mount();
 
+        /*!
+         * List all file in mounted filesystem.
+         */
+        void list();
+
+        /*!
+         * Reformat disk to have a FAT filesystem.
+         */
+        void reformat();
+
     private:
         flash_driver m_disk;
         FATFS m_filesystem;
