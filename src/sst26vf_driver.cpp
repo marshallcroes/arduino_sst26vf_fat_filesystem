@@ -80,6 +80,14 @@ bool flash_driver::begin()
 {
         m_spi->begin();
 
+        // unlock write protected blocks
+        write_enable();
+
+        // The default state after powerup reset is write-protected
+        digitalWrite(m_ss, LOW);
+        spi_handler::write(*this, SST26VF_CMD_ULBPR)
+        digitalWrite(m_ss, HIGH);
+
         return true;
 }
 

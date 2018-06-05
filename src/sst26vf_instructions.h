@@ -82,7 +82,7 @@
 #define SST26VF_CMD_WBPR            0x42
 #define SST26VF_CMD_LBPR            0x8d
 #define SST26VF_CMD_NVWLDR          0xe8
-#define SST26VF_CMD_ULBPR           0x98
+#define SST26VF_CMD_ULBPR           0x98 // global block Protection unlock
 #define SST26VF_CMD_RSID            0x88
 #define SST26VF_CMD_PSID            0xa5
 #define SST26VF_CMD_LSID            0x85
