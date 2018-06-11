@@ -38,7 +38,7 @@ namespace detail {
                 byte c;
 
                 // SST26VF chips operate on SPI_MODE2, input sample on rising and output on falling edge
-                self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
+                self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE3));
                 while (len--) {
                         c = *data;
                         data++;
@@ -55,9 +55,10 @@ namespace detail {
                 uint8_t x = 0;
 
                 // SST26VF chips operate on SPI_MODE2, input sample on rising and output on falling edge
-                self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE2));
+                self.m_spi->beginTransaction(SPISettings(F_CPU, MSBFIRST, SPI_MODE3));
                 while (len--) {
-                        x = self.m_spi->transfer(SST26VF_CMD_NOP);
+                        // x = self.m_spi->transfer(SST26VF_CMD_NOP);
+                        x = self.m_spi->transfer(0xff);
                         *data = x;
                         data++;
                 }
@@ -81,12 +82,18 @@ bool flash_driver::begin()
         m_spi->begin();
 
         // unlock write protected blocks
-        write_enable();
+        write_enable(true);
+
+        uint8_t status = read_status() & SST26VF_STAT_WEL;
+        if (!status)
+                return false;
 
         // The default state after powerup reset is write-protected
         digitalWrite(m_ss, LOW);
-        spi_handler::write(*this, SST26VF_CMD_ULBPR)
+        spi_handler::write(*this, SST26VF_CMD_ULBPR);
         digitalWrite(m_ss, HIGH);
+
+        wait_until_ready();
 
         return true;
 }
@@ -119,16 +126,22 @@ bool flash_driver::wait_until_ready(uint32_t timeout)
         uint8_t status;
 
         // Read status bit to check if busy
-        while (timeout > 0) {
-                status = read_status() & (SST26VF_STAT_BUSY | SST26VF_STAT_BUSY2);
-                if (!status)
-                        return false;
+        // while (timeout > 0) {
+        //         status = read_status() & (SST26VF_STAT_BUSY | SST26VF_STAT_BUSY2);
+        //         if (!status)
+        //                 return false;
 
+        //         asm __volatile__("nop");
+        //         timeout--;
+        // }
+        do {
+                // status = read_status() & (SST26VF_STAT_BUSY | SST26VF_STAT_BUSY2);
+                status = read_status();
+                status &= (SST26VF_STAT_BUSY2);
                 asm __volatile__("nop");
-                timeout--;
-        }
+        } while(!status);
 
-        return true;
+        return false;
 }
 
 uint32_t flash_driver::write_buffer(uint32_t addr, uint8_t* buf, uint32_t len)
@@ -224,8 +237,9 @@ uint32_t flash_driver::write_page(uint32_t addr, uint8_t* buf, uint32_t len)
         digitalWrite(m_ss, HIGH);
 
         // Wait until the device is ready or a timeout occurs
-        if (wait_until_ready(5))
-                return 0;
+        // if (wait_until_ready(150))
+        //         return 0;
+        wait_until_ready();
 
         return len;
 }
@@ -279,7 +293,7 @@ bool flash_driver::erase_chip()
         spi_handler::write(*this, SST26VF_CMD_CE);
         digitalWrite(m_ss, HIGH);
 
-        if (wait_until_ready(12000))
+        if (wait_until_ready(500))
                 return false;
 
         return true;
@@ -301,14 +315,14 @@ bool flash_driver::erase_sector(uint32_t sector_num)
                 SST26VF_CMD_SE,
                 (addr >> 16) & 0xff,
                 (addr >> 8) & 0xff,
-                (addr)&0xff,
+                (addr)& 0xff,
         };
 
         digitalWrite(m_ss, LOW);
         spi_handler::write(*this, cmd_list, 4);
         digitalWrite(m_ss, HIGH);
 
-        wait_until_ready(500);
+        wait_until_ready(250);
 
         return true;
 }
@@ -352,7 +366,7 @@ bool flash_driver::erase_block(uint32_t block_num)
         spi_handler::write(*this, cmd_list, 4);
         digitalWrite(m_ss, HIGH);
 
-        wait_until_ready(2000);
+        wait_until_ready(250);
 
         return true;
 }

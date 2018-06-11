@@ -114,7 +114,7 @@ class flash_driver {
          */
         void get_manufacturer_info(uint8_t* mfr_id, uint8_t* dev_type, uint8_t* dev_id);
 
-    private:
+    // private:
         bool write_enable(bool enable);
 
         uint8_t read_status();
